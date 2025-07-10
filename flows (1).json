@@ -1,0 +1,978 @@
+[
+    {
+        "id": "78f04c1128a4100f",
+        "type": "tab",
+        "label": "AMAR",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "40836f6546617f82",
+        "type": "group",
+        "z": "78f04c1128a4100f",
+        "name": "STORE DATA TO DATABASE",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "e4490a2d78dd322c",
+            "c681dfee683963ac"
+        ],
+        "x": 334,
+        "y": 19,
+        "w": 572,
+        "h": 82
+    },
+    {
+        "id": "e60475206a7c8a84",
+        "type": "group",
+        "z": "78f04c1128a4100f",
+        "name": "HAPUS DATA",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "ed449970653dd819",
+            "cd05144cfc9eba99",
+            "9bf38d8462aab94b",
+            "50403f5c993954e2"
+        ],
+        "x": 74,
+        "y": 699,
+        "w": 852,
+        "h": 82
+    },
+    {
+        "id": "4ba10ca2f909b10b",
+        "type": "group",
+        "z": "78f04c1128a4100f",
+        "name": "Tampilkan Data ke Dashboard",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "d0fe0f29b216778b",
+            "6594cc0b71735e9d",
+            "30397002da674aae",
+            "4b0bcdb747c158f2",
+            "043e0b845b7df3ad",
+            "e514a64f377365a2",
+            "c950a419bb3685de"
+        ],
+        "x": 334,
+        "y": 119,
+        "w": 552,
+        "h": 282
+    },
+    {
+        "id": "648f17be04570b3a",
+        "type": "group",
+        "z": "78f04c1128a4100f",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "81c40225139934ae",
+            "6813becc9e0d8ec1",
+            "e9f81cf86ae13e54",
+            "df41d33c64d8a964",
+            "73acbbe2699ca38a",
+            "b44068ca67893d02",
+            "ef8d591e536f6f75",
+            "a4e69ed96d6da2d6",
+            "2712885782638107",
+            "12a7566007338f1d",
+            "bb485c197f9e6b06",
+            "c13cd3ced5ac89a2"
+        ],
+        "x": 74,
+        "y": 439,
+        "w": 932,
+        "h": 222
+    },
+    {
+        "id": "e4552ffc63cc8271",
+        "type": "mqtt in",
+        "z": "78f04c1128a4100f",
+        "name": "ONLINE subs",
+        "topic": "kelA1/online",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "55c05c340166d460",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 150,
+        "y": 140,
+        "wires": [
+            [
+                "e4490a2d78dd322c",
+                "d0fe0f29b216778b"
+            ]
+        ]
+    },
+    {
+        "id": "e4490a2d78dd322c",
+        "type": "function",
+        "z": "78f04c1128a4100f",
+        "g": "40836f6546617f82",
+        "name": "SAVE TO DATABASE",
+        "func": "var distance = msg.payload.distance;\nvar ph = msg.payload.ph;\nvar arus = msg.payload.Arus; // Changed from 'daya' to 'Arus'\nvar pressure = msg.payload.pressure; // Added pressure\n\nvar unixtime;\n// ESP32 sends timestamp for offline data, otherwise Node-RED generates it\nif (msg.payload.timestamp !== undefined && msg.payload.timestamp !== null) {\n    unixtime = msg.payload.timestamp;\n} else {\n    unixtime = parseInt(((Date.now() / 1000).toFixed(10)));\n}\n\n// Validate data to prevent undefined values\nif (ph === undefined || ph === null) ph = 0;\nif (distance === undefined || distance === null) distance = 0;\nif (arus === undefined || arus === null) arus = 0; // Validate arus\nif (pressure === undefined || pressure === null) pressure = 0; // Validate pressure\n\n// Adjust the INSERT query to match the new payload structure and add 'pressure'\n// You should also ensure your database table `Projek Siseljut` has 'Arus' and 'pressure' columns\nmsg.topic = \"INSERT INTO `Projek Siseljut` (ph, distance, Arus, pressure, unixtime) VALUES(\" + ph + \",\" + distance + \",\" + arus + \",\" + pressure + \",\" + unixtime + \")\";\n\nmsg.payload = {\n    ph: ph,\n    distance: distance,\n    Arus: arus, // Changed to Arus\n    pressure: pressure // Added pressure\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 60,
+        "wires": [
+            [
+                "c681dfee683963ac"
+            ]
+        ]
+    },
+    {
+        "id": "ed449970653dd819",
+        "type": "function",
+        "z": "78f04c1128a4100f",
+        "g": "e60475206a7c8a84",
+        "name": "DELETE DATABASE",
+        "func": "msg.topic = \"DELETE FROM `Projek Siseljut`\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 740,
+        "wires": [
+            [
+                "cd05144cfc9eba99"
+            ]
+        ]
+    },
+    {
+        "id": "9bf38d8462aab94b",
+        "type": "debug",
+        "z": "78f04c1128a4100f",
+        "g": "e60475206a7c8a84",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 820,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "d0fe0f29b216778b",
+        "type": "function",
+        "z": "78f04c1128a4100f",
+        "g": "4ba10ca2f909b10b",
+        "name": "Parsing data",
+        "func": "var distance = msg.payload.distance;\nvar ph = msg.payload.ph;\nvar arus = msg.payload.Arus; // Changed from 'daya' to 'Arus'\nvar pressure = msg.payload.pressure; // Added pressure\n\nreturn [\n    {payload : distance},\n    {payload : ph},\n    {payload: arus},\n    {payload: pressure}\n];",
+        "outputs": 4,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 220,
+        "wires": [
+            [
+                "043e0b845b7df3ad",
+                "6594cc0b71735e9d"
+            ],
+            [
+                "4b0bcdb747c158f2",
+                "30397002da674aae"
+            ],
+            [
+                "e514a64f377365a2",
+                "c950a419bb3685de"
+            ],
+            [
+                "d23f7c4e5f7e8a9b",
+                "a1b2c3d4e5f67890"
+            ]
+        ]
+    },
+    {
+        "id": "6594cc0b71735e9d",
+        "type": "ui_chart",
+        "z": "78f04c1128a4100f",
+        "g": "4ba10ca2f909b10b",
+        "name": "",
+        "group": "d6ce21bc59035408",
+        "order": 1,
+        "width": 12,
+        "height": 4,
+        "label": "Distance",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "60",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 780,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "30397002da674aae",
+        "type": "ui_chart",
+        "z": "78f04c1128a4100f",
+        "g": "4ba10ca2f909b10b",
+        "name": "",
+        "group": "d6ce21bc59035408",
+        "order": 2,
+        "width": 12,
+        "height": 4,
+        "label": "PH",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "14",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 770,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4b0bcdb747c158f2",
+        "type": "ui_gauge",
+        "z": "78f04c1128a4100f",
+        "g": "4ba10ca2f909b10b",
+        "name": "",
+        "group": "3250b3d94e1fa8e6",
+        "order": 2,
+        "width": 6,
+        "height": 3,
+        "gtype": "gage",
+        "title": "PH",
+        "label": "",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "14",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 790,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "043e0b845b7df3ad",
+        "type": "ui_gauge",
+        "z": "78f04c1128a4100f",
+        "g": "4ba10ca2f909b10b",
+        "name": "",
+        "group": "3250b3d94e1fa8e6",
+        "order": 1,
+        "width": "6",
+        "height": "3",
+        "gtype": "gage",
+        "title": "Distance",
+        "label": "",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "60",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 800,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "50403f5c993954e2",
+        "type": "ui_button",
+        "z": "78f04c1128a4100f",
+        "g": "e60475206a7c8a84",
+        "name": "",
+        "group": "7e4ca4b84762c487",
+        "order": 7,
+        "width": 3,
+        "height": 1,
+        "passthru": false,
+        "label": "DELETE DATA",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "red",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 180,
+        "y": 740,
+        "wires": [
+            [
+                "ed449970653dd819"
+            ]
+        ]
+    },
+    {
+        "id": "e514a64f377365a2",
+        "type": "ui_gauge",
+        "z": "78f04c1128a4100f",
+        "g": "4ba10ca2f909b10b",
+        "name": "",
+        "group": "3250b3d94e1fa8e6",
+        "order": 2,
+        "width": "6",
+        "height": "3",
+        "gtype": "gage",
+        "title": "Current (mA)",
+        "label": "",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 790,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "c950a419bb3685de",
+        "type": "ui_chart",
+        "z": "78f04c1128a4100f",
+        "g": "4ba10ca2f909b10b",
+        "name": "",
+        "group": "d6ce21bc59035408",
+        "order": 2,
+        "width": 12,
+        "height": 4,
+        "label": "Current (mA)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "400",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 770,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e9f81cf86ae13e54",
+        "type": "function",
+        "z": "78f04c1128a4100f",
+        "g": "648f17be04570b3a",
+        "name": "INPUT TANGGAL",
+        "func": "var waktu_WIB = 7 * 60 * 60;\nvar tanggal = parseInt(msg.payload/1000) - waktu_WIB;\n\nflow.set('tanggal', tanggal);\n\nmsg.payload = tanggal;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "df41d33c64d8a964",
+        "type": "function",
+        "z": "78f04c1128a4100f",
+        "g": "648f17be04570b3a",
+        "name": "INPUT WAKTU AWAL",
+        "func": "var waktu_awal = parseInt(msg.payload / 1000);\nflow.set('waktu_awal', waktu_awal);\nmsg.payload = waktu_awal;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "73acbbe2699ca38a",
+        "type": "function",
+        "z": "78f04c1128a4100f",
+        "g": "648f17be04570b3a",
+        "name": "INPUT WAKTU AKHIR",
+        "func": "var waktu_akhir = parseInt(msg.payload/1000);\nflow.set('waktu_akhir', waktu_akhir);\nmsg.payload = waktu_akhir;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b44068ca67893d02",
+        "type": "function",
+        "z": "78f04c1128a4100f",
+        "g": "648f17be04570b3a",
+        "name": "DATABASE QUERY",
+        "func": "var tanggal = flow.get('tanggal');\nvar waktu_awal = flow.get('waktu_awal');\nvar waktu_akhir = flow.get('waktu_akhir');\n\nvar start = tanggal+waktu_awal;\nvar end = tanggal+waktu_akhir;\n\n// Adjust columns in SELECT query to match new ESP32 payload\nmsg.topic = \"SELECT unixtime, ph, distance, Arus, pressure FROM `Projek Siseljut` WHERE unixtime BETWEEN \"+start+\" AND \"+end+\";\";\nmsg.payload = [tanggal,waktu_awal,waktu_akhir,start, end];\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 620,
+        "wires": [
+            [
+                "81c40225139934ae",
+                "a4e69ed96d6da2d6"
+            ]
+        ]
+    },
+    {
+        "id": "ef8d591e536f6f75",
+        "type": "function",
+        "z": "78f04c1128a4100f",
+        "g": "648f17be04570b3a",
+        "name": "SET PARAMETER",
+        "func": "let array = msg.payload;\n\narray.forEach((data, index) => {\n    const date = new Date(data.unixtime * 1000);\n    data.unixtime = date.toLocaleString('es-US',{\n        timeZone: \"Asia/Jakarta\",\n        hour: \"2-digit\",\n        minute: \"2-digit\",\n        hour12: false\n    });\n\n    data.ph = data.ph + \" ph\";\n    data.distance = data.distance + \" cm\";\n    data.Arus = data.Arus + \" mA\"; // Changed from 'daya' to 'Arus' with correct unit\n    data.pressure = data.pressure + \" raw\"; // Added pressure with unit\n    data.number = index + 1;\n\n});\n\nmsg.payload = array;\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 620,
+        "wires": [
+            [
+                "6813becc9e0d8ec1"
+            ]
+        ]
+    },
+    {
+        "id": "a4e69ed96d6da2d6",
+        "type": "debug",
+        "z": "78f04c1128a4100f",
+        "g": "648f17be04570b3a",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 590,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "2712885782638107",
+        "type": "ui_date_picker",
+        "z": "78f04c1128a4100f",
+        "g": "648f17be04570b3a",
+        "name": "",
+        "label": "Tanggal",
+        "group": "7e4ca4b84762c487",
+        "order": 1,
+        "width": 9,
+        "height": 1,
+        "passthru": true,
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 160,
+        "y": 480,
+        "wires": [
+            [
+                "e9f81cf86ae13e54"
+            ]
+        ]
+    },
+    {
+        "id": "12a7566007338f1d",
+        "type": "ui_text_input",
+        "z": "78f04c1128a4100f",
+        "g": "648f17be04570b3a",
+        "name": "",
+        "label": "Dari",
+        "tooltip": "",
+        "group": "7e4ca4b84762c487",
+        "order": 3,
+        "width": 5,
+        "height": 1,
+        "passthru": true,
+        "mode": "time",
+        "delay": "1",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 150,
+        "y": 520,
+        "wires": [
+            [
+                "df41d33c64d8a964"
+            ]
+        ]
+    },
+    {
+        "id": "bb485c197f9e6b06",
+        "type": "ui_text_input",
+        "z": "78f04c1128a4100f",
+        "g": "648f17be04570b3a",
+        "name": "",
+        "label": "Sampai",
+        "tooltip": "",
+        "group": "7e4ca4b84762c487",
+        "order": 4,
+        "width": 4,
+        "height": 1,
+        "passthru": true,
+        "mode": "time",
+        "delay": "1",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 160,
+        "y": 560,
+        "wires": [
+            [
+                "73acbbe2699ca38a"
+            ]
+        ]
+    },
+    {
+        "id": "c13cd3ced5ac89a2",
+        "type": "ui_button",
+        "z": "78f04c1128a4100f",
+        "g": "648f17be04570b3a",
+        "name": "",
+        "group": "7e4ca4b84762c487",
+        "order": 2,
+        "width": 3,
+        "height": 1,
+        "passthru": false,
+        "label": "SUBMIT",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 160,
+        "y": 620,
+        "wires": [
+            [
+                "b44068ca67893d02"
+            ]
+        ]
+    },
+    {
+        "id": "c681dfee683963ac",
+        "type": "mysql",
+        "z": "78f04c1128a4100f",
+        "g": "40836f6546617f82",
+        "mydb": "26c887be2f34f872",
+        "name": "",
+        "x": 830,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cd05144cfc9eba99",
+        "type": "mysql",
+        "z": "78f04c1128a4100f",
+        "g": "e60475206a7c8a84",
+        "mydb": "26c887be2f34f872",
+        "name": "",
+        "x": 630,
+        "y": 740,
+        "wires": [
+            [
+                "9bf38d8462aab94b"
+            ]
+        ]
+    },
+    {
+        "id": "81c40225139934ae",
+        "type": "mysql",
+        "z": "78f04c1128a4100f",
+        "g": "648f17be04570b3a",
+        "mydb": "26c887be2f34f872",
+        "name": "",
+        "x": 570,
+        "y": 620,
+        "wires": [
+            [
+                "ef8d591e536f6f75"
+            ]
+        ]
+    },
+    {
+        "id": "6813becc9e0d8ec1",
+        "type": "ui_table",
+        "z": "78f04c1128a4100f",
+        "g": "648f17be04570b3a",
+        "group": "7e4ca4b84762c487",
+        "name": "",
+        "order": 8,
+        "width": 12,
+        "height": 9,
+        "columns": [
+            {
+                "field": "number",
+                "title": "No.",
+                "width": "",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "unixtime",
+                "title": "Time",
+                "width": "",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "ph",
+                "title": "PH",
+                "width": "",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "distance",
+                "title": "Jarak Air",
+                "width": "",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "Arus",
+                "title": "Arus",
+                "width": "",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "pressure",
+                "title": "Pressure (Raw)",
+                "width": "",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            }
+        ],
+        "outputs": 0,
+        "cts": false,
+        "x": 930,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "d23f7c4e5f7e8a9b",
+        "type": "ui_gauge",
+        "z": "78f04c1128a4100f",
+        "g": "4ba10ca2f909b10b",
+        "name": "",
+        "group": "3250b3d94e1fa8e6",
+        "order": 3,
+        "width": "6",
+        "height": "3",
+        "gtype": "gage",
+        "title": "Pressure (Raw)",
+        "label": "",
+        "format": "{{value}}",
+        "min": "-500000",
+        "max": "2000000",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 790,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "a1b2c3d4e5f67890",
+        "type": "ui_chart",
+        "z": "78f04c1128a4100f",
+        "g": "4ba10ca2f909b10b",
+        "name": "",
+        "group": "d6ce21bc59035408",
+        "order": 3,
+        "width": 12,
+        "height": 4,
+        "label": "Pressure (Raw)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "-500000",
+        "ymax": "2000000",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 770,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9a29e3cf35948a33",
+        "type": "ui_spacer",
+        "z": "78f04c1128a4100f",
+        "name": "spacer",
+        "group": "7e4ca4b84762c487",
+        "order": 6,
+        "width": 9,
+        "height": 1
+    },
+    {
+        "id": "55c05c340166d460",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "db90cf2e.ala.asia-southeast1.emqxsl.com",
+        "port": "8883",
+        "tls": "",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "d6ce21bc59035408",
+        "type": "ui_group",
+        "name": "CHART",
+        "tab": "23ce40b25f59cdd3",
+        "order": 3,
+        "disp": true,
+        "width": 12,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "3250b3d94e1fa8e6",
+        "type": "ui_group",
+        "name": "GAUGE",
+        "tab": "23ce40b25f59cdd3",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "7e4ca4b84762c487",
+        "type": "ui_group",
+        "name": "TABLE",
+        "tab": "23ce40b25f59cdd3",
+        "order": 2,
+        "disp": true,
+        "width": 12,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "26c887be2f34f872",
+        "type": "MySQLdatabase",
+        "name": "",
+        "host": "127.0.0.1",
+        "port": "3306",
+        "db": "situiot",
+        "tz": "",
+        "charset": "UTF8"
+    },
+    {
+        "id": "23ce40b25f59cdd3",
+        "type": "ui_tab",
+        "name": "Monitoring Setu Babakan",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
