@@ -35,7 +35,7 @@ const char* password = "setubabakan";
 
 // Emqx
 const char* mqtt_server = "db90cf2e.ala.asia-southeast1.emqxsl.com";
-const char* mqtt_user = "AMAR";
+const char* mqtt_user = "kelompokA1";
 const char* mqtt_pass = "amar113118";
 
 // NTP Server settings
