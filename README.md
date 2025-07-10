@@ -79,3 +79,12 @@ Berikut adalah alur kerja utama dari program ini:
 * **`rawToCm(long raw)`**: Mengkonversi nilai mentah dari sensor HX711 menjadi tinggi level air dalam sentimeter menggunakan interpolasi berdasarkan titik kalibrasi yang diketahui. Ini juga menangani ekstrapolasi di luar titik kalibrasi.
 
 ---
+
+### **4. Skema Rangkaian**
+<img width="919" height="493" alt="image" src="https://github.com/user-attachments/assets/77778c87-8f84-4d44-85cb-2f7e1e52a2bd" />
+
+---
+
+### **5. Hasil Rangkaian**
+<img width="512" height="367" alt="image" src="https://github.com/user-attachments/assets/4362727c-f54e-44e2-a63c-baf6c26bbe79" /> <img width="427" height="709" alt="image" src="https://github.com/user-attachments/assets/fef97b13-9ec2-42d6-9539-a82b7e080495" />
+
